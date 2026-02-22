@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Together — Stay Close</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root{--cr:#FAF7F2;--wm:#FFFCF8;--st:#E8E0D5;--pb:#C9BFB4;--bk:#8B7D72;--dp:#3D3530;--bl:#E8C5B8;--sg:#B8C5B8;--gd:#C4A882;--gl:#D9C4A8;--bg:var(--cr);--sf:var(--wm);--bd:var(--st);--tx:var(--dp);--mt:var(--bk);--sb:var(--pb);--er:#C0574A}
+[data-theme=dark]{--bg:#1C1814;--sf:#252019;--bd:#3A342E;--tx:#EDE5DB;--mt:#9A8C82;--sb:#6B5F57;--st:#3A342E;--pb:#6B5F57;--bk:#9A8C82;--dp:#EDE5DB;--cr:#1C1814;--wm:#252019;--gl:#A88B68}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;justify-content:center;transition:background .3s,color .3s}
+.wrap{width:100%;max-width:480px;min-height:100vh;display:flex;flex-direction:column;background:var(--bg);position:relative;overflow:hidden;box-shadow:0 0 80px rgba(0,0,0,.08)}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;transform:translateY(10px);background:var(--bg);overflow-y:auto}
+.screen.active{opacity:1;pointer-events:all;transform:translateY(0);position:relative}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SIGN IN ── */
+.si-bg{position:absolute;inset:0;background:linear-gradient(160deg,var(--cr),#F0E8DE,#E8DDD2);z-index:0}
+[data-theme=dark] .si-bg{background:linear-gradient(160deg,#1C1814,#221E19,#2A231C)}
+.si-deco{position:absolute;font-size:200px;color:rgba(196,168,130,.1);right:-20px;top:30px;z-index:0;pointer-events:none;line-height:1}
+.si-cnt{position:relative;z-index:1;padding:56px 30px 36px;display:flex;flex-direction:column;min-height:100vh}
+.logo{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:300;color:var(--tx);line-height:1}
+.logo span{font-style:italic;color:var(--gd)}
+.si-tag{font-size:12px;color:var(--mt);font-weight:300;margin-top:5px;letter-spacing:.04em}
+.si-form{margin-top:auto;padding-top:36px}
+.si-hl{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:var(--tx);margin-bottom:5px;line-height:1.2}
+.si-hl em{font-style:italic;color:var(--gd)}
+.si-sub{font-size:12px;color:var(--mt);font-weight:300;margin-bottom:24px}
+.fg{margin-bottom:13px}
+.fl{display:block;font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--mt);margin-bottom:5px}
+.fi{width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:13px 15px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:300;color:var(--tx);outline:none;transition:border-color .2s}
+.fi::placeholder{color:var(--sb)}
+.fi:focus{border-color:var(--gl)}
+.ferr{font-size:11px;color:var(--er);margin-top:4px;display:none}
+.pbtn{width:100%;background:var(--dp);color:var(--cr);border:none;border-radius:50px;padding:14px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;margin-top:7px}
+[data-theme=dark] .pbtn{background:var(--gd);color:#1C1814}
+.pbtn:hover{opacity:.82}.pbtn:active{transform:scale(.98)}
+.si-sw{text-align:center;font-size:12px;color:var(--mt);font-weight:300;margin-top:14px}
+.si-sw a{color:var(--gd);cursor:pointer;font-weight:400}
+
+/* ── ONBOARDING ── */
+.ob-prog{display:flex;gap:5px;padding:18px 26px 0}
+.pd{flex:1;height:3px;background:var(--bd);border-radius:3px;transition:background .3s}
+.pd.done{background:var(--gd)}
+.ob-step{display:none;flex-direction:column;padding:24px 26px 20px;flex:1;animation:fadeUp .3s ease}
+.ob-step.active{display:flex}
+.step-ic{font-size:40px;margin-bottom:14px}
+.step-ttl{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;line-height:1.2;margin-bottom:5px}
+.step-ttl em{font-style:italic;color:var(--gd)}
+.step-ds{font-size:12px;color:var(--mt);font-weight:300;margin-bottom:24px;line-height:1.6}
+.ob-ft{padding:0 26px 28px;display:flex;gap:9px}
+.bk-sm{background:none;border:1px solid var(--bd);border-radius:50px;padding:13px 18px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--mt);cursor:pointer}
+.nx-btn{flex:1;background:var(--dp);color:var(--cr);border:none;border-radius:50px;padding:13px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:400;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:opacity .2s}
+[data-theme=dark] .nx-btn{background:var(--gd);color:#1C1814}
+.nx-btn:hover{opacity:.82}
+
+/* ── MAIN HEADER ── */
+.app-hdr{padding:18px 22px 13px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--bd);background:var(--sf);flex-shrink:0}
+.app-ttl{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:300;color:var(--tx);line-height:1;cursor:pointer}
+.app-ttl span{font-style:italic;color:var(--gd)}
+.hdr-r{text-align:right}
+.pt-lb{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--sb);font-weight:300}
+.pt-nm{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--tx);display:block;margin-top:1px}
+.dist-b{display:inline-flex;align-items:center;gap:4px;background:var(--st);border-radius:20px;padding:3px 8px;font-size:9px;color:var(--mt);margin-top:3px}
+.pls{width:5px;height:5px;background:var(--sg);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+/* ── TABS ── */
+.tab-nav{display:flex;background:var(--sf);border-bottom:1px solid var(--bd);overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.tab-nav::-webkit-scrollbar{display:none}
+.tb{flex:1;min-width:52px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 5px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:9px;font-weight:400;color:var(--sb);letter-spacing:.06em;text-transform:uppercase;transition:color .2s;position:relative}
+.tb.active{color:var(--tx)}
+.tb.active::after{content:'';position:absolute;bottom:0;left:22%;right:22%;height:2px;background:var(--gd);border-radius:2px 2px 0 0}
+.ti{font-size:17px;line-height:1}
+.tab-con{flex:1;overflow-y:auto}
+.tp{display:none;animation:fadeUp .3s ease}
+.tp.active{display:block}
+
+/* ── SHARED ── */
+.sh{padding:22px 22px 5px}
+.sttl{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;line-height:1.1}
+.sttl em{font-style:italic;color:var(--gd)}
+.ssub{font-size:11px;color:var(--mt);font-weight:300;margin-top:3px}
+.card{margin:9px 17px;background:var(--sf);border-radius:15px;border:1px solid var(--bd);overflow:hidden;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(0,0,0,.06)}
+.ci{padding:17px}
+.clb{font-size:9px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--sb);margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.clb::before{content:'';display:inline-block;width:12px;height:1px;background:var(--sb)}
+.sbtn{background:var(--dp);color:var(--cr);border:none;border-radius:50px;padding:9px 20px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:400;letter-spacing:.07em;cursor:pointer;transition:opacity .2s;text-transform:uppercase}
+[data-theme=dark] .sbtn{background:var(--gd);color:#1C1814}
+.sbtn:hover{opacity:.8}.sbtn:active{transform:scale(.97)}
+.bsp{height:26px}
+
+/* ── HOME ── */
+.gh{padding:28px 22px 22px;background:linear-gradient(160deg,var(--sf),var(--st));border-bottom:1px solid var(--bd);position:relative;overflow:hidden}
+.gh::before{content:'❧';position:absolute;right:-6px;top:-6px;font-size:100px;color:var(--bd);opacity:.7;line-height:1;pointer-events:none}
+.gt{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mt);font-weight:300;margin-bottom:5px}
+.gx{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;line-height:1.15;color:var(--tx);margin-bottom:4px}
+.gx em{font-style:italic;color:var(--gd)}
+.gs{font-size:12px;color:var(--mt);font-weight:300;max-width:230px;line-height:1.6}
+.cd{margin:9px 17px;background:linear-gradient(135deg,var(--st),#E3D9CC);border-radius:15px;padding:15px 17px;display:flex;align-items:center;justify-content:space-between}
+[data-theme=dark] .cd{background:linear-gradient(135deg,#2E271F,#352D24)}
+.cdl{display:flex;align-items:center;gap:11px}
+.cdi{font-size:24px}
+.cdlb{font-size:10px;color:var(--mt);font-weight:300}
+.cdlb strong{display:block;font-size:12px;font-weight:500;color:var(--tx)}
+.cdn{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:var(--gd);line-height:1}
+.cdu{font-size:9px;color:var(--mt);text-align:center;letter-spacing:.05em;text-transform:uppercase}
+.qa{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:9px 17px 0}
+.qab{background:var(--sf);border:1px solid var(--bd);border-radius:13px;padding:13px 11px;cursor:pointer;text-align:left;transition:all .2s;font-family:'DM Sans',sans-serif}
+.qab:hover{border-color:var(--gl);background:var(--bg);transform:translateY(-1px)}
+.qi{font-size:19px;display:block;margin-bottom:4px}
+.ql{font-size:11px;font-weight:500;color:var(--tx);display:block}
+.qd{font-size:10px;color:var(--mt);font-weight:300;margin-top:1px;display:block}
+.ns{margin:9px 17px;background:var(--sf);border:1px solid var(--bd);border-radius:13px;padding:13px 15px;display:flex;align-items:center;gap:9px;cursor:pointer;transition:border-color .2s}
+.ns:hover{border-color:var(--gl)}
+.ni{font-size:22px;flex-shrink:0}
+.nt{font-size:12px;font-weight:500;color:var(--tx)}
+.nd{font-size:10px;color:var(--mt);font-weight:300;margin-top:1px}
+.na{margin-left:auto;color:var(--sb);font-size:15px}
+
+/* ── MESSAGES ── */
+.mtr{display:flex;gap:6px;padding:13px 17px 2px;overflow-x:auto;scrollbar-width:none}
+.mtr::-webkit-scrollbar{display:none}
+.mc{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--sf);border:1.5px solid var(--bd);border-radius:11px;padding:9px 11px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.mc:hover,.mc.active{border-color:var(--gd);background:var(--bg)}
+.mci{font-size:18px}
+.mcl{font-size:9px;color:var(--mt);letter-spacing:.04em}
+.ca{margin:5px 17px}
+.cb{width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:13px;padding:13px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:300;color:var(--tx);resize:none;outline:none;transition:border-color .2s;min-height:85px}
+.cb::placeholder{color:var(--sb)}.cb:focus{border-color:var(--gl)}
+.cf{display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding:0 2px}
+.ccnt{font-size:10px;color:var(--sb)}
+.sugb{background:none;border:1px solid var(--gl);border-radius:50px;padding:7px 13px;font-family:'DM Sans',sans-serif;font-size:10px;color:var(--mt);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px}
+.sugb:hover{background:var(--sf);border-color:var(--gd)}
+.pm{padding:5px 0 9px}
+.mi{padding:11px 17px;border-top:1px solid var(--bd);display:flex;gap:9px;align-items:flex-start}
+.mav{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--bl),var(--gl));display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.mb{flex:1}
+.mm{display:flex;justify-content:space-between;margin-bottom:2px}
+.msn{font-size:11px;font-weight:500;color:var(--tx)}
+.mtm{font-size:9px;color:var(--sb)}
+.mtxt{font-size:12px;color:var(--mt);font-weight:300;line-height:1.5}
+.mtag{display:inline-block;font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--gd);margin-bottom:2px}
+
+/* ── MOMENTS ── */
+.mup{margin:13px 17px;background:var(--sf);border:1.5px dashed var(--pb);border-radius:15px;padding:26px 17px;text-align:center;cursor:pointer;transition:all .2s}
+.mup:hover{border-color:var(--gd);background:var(--bg)}
+.upi{font-size:26px;display:block;margin-bottom:5px}
+.upt{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:300;color:var(--tx)}
+.ups{font-size:10px;color:var(--mt);font-weight:300;margin-top:2px}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:2px 17px 17px}
+.moc{border-radius:13px;overflow:hidden;position:relative;aspect-ratio:1;background:var(--st);cursor:pointer}
+.mep{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--st),var(--gl));font-size:32px}
+.mov{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(20,14,10,.72));padding:16px 8px 7px}
+.mcp{font-size:10px;color:rgba(255,255,255,.9);font-weight:300}
+.msr{font-size:8px;color:rgba(255,255,255,.55);letter-spacing:.06em;text-transform:uppercase}
+.rab{position:absolute;top:7px;right:7px;background:rgba(255,255,255,.85);border:none;border-radius:50%;width:26px;height:26px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.rab:hover{transform:scale(1.2)}
+
+/* ── JOURNAL ── */
+.jst{margin:13px 17px 4px;background:linear-gradient(135deg,var(--st),#E3D9CC);border-radius:15px;padding:15px 17px;display:flex;align-items:center;justify-content:space-between}
+[data-theme=dark] .jst{background:linear-gradient(135deg,#2E271F,#352D24)}
+.stn{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:var(--tx);line-height:1}
+.stl{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--mt)}
+.sts{font-size:10px;color:var(--mt);font-weight:300}
+.stf{font-size:20px;letter-spacing:-4px}
+.jp{padding:4px 17px 5px}
+.plb{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--sb);margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.plb::before{content:'';display:inline-block;width:12px;height:1px;background:var(--sb)}
+.pcs{display:flex;flex-direction:column;gap:6px}
+.pc{background:var(--sf);border:1px solid var(--bd);border-radius:11px;padding:11px 13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:space-between}
+.pc:hover{border-color:var(--gl);background:var(--bg)}
+.pt{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:300;font-style:italic;color:var(--tx);line-height:1.3;flex:1}
+.par{font-size:13px;color:var(--sb);margin-left:7px}
+.je{margin:5px 17px}
+.eb{width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:13px;padding:14px;font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:300;font-style:italic;color:var(--tx);resize:none;outline:none;transition:border-color .2s;min-height:110px;line-height:1.7}
+.eb::placeholder{color:var(--sb)}.eb:focus{border-color:var(--gl)}
+.mdr{display:flex;gap:5px}
+.mdb{background:var(--st);border:none;border-radius:9px;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.mdb:hover{transform:scale(1.15)}
+.pe{padding:4px 0 14px}
+.ei{padding:12px 17px;border-top:1px solid var(--bd)}
+.ed{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--sb);margin-bottom:4px}
+.ep{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:300;font-style:italic;color:var(--mt);line-height:1.5}
+.er2{font-size:12px;margin-top:4px;letter-spacing:2px}
+
+/* ── GAMES ── */
+.gg{display:flex;flex-direction:column;gap:7px;padding:13px 17px 17px}
+.gc{background:var(--sf);border:1px solid var(--bd);border-radius:15px;overflow:hidden;cursor:pointer;transition:all .2s}
+.gc:hover{border-color:var(--gl);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.gci{padding:15px 17px;display:flex;align-items:center;gap:13px}
+.gic{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,var(--st),var(--gl));display:flex;align-items:center;justify-content:center;font-size:23px;flex-shrink:0}
+.gin{flex:1}
+.gnm{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;color:var(--tx);line-height:1.2}
+.gds{font-size:11px;color:var(--mt);font-weight:300;margin-top:2px;line-height:1.4}
+.gbg{font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:var(--st);color:var(--mt);white-space:nowrap}
+.gbg.turn{background:#E8F0E8;color:#5A7A5A}
+.gbg.new{background:#F0E8E0;color:#8B6040}
+[data-theme=dark] .gbg.turn{background:#1E2E1E;color:#7AAA7A}
+[data-theme=dark] .gbg.new{background:#2E201A;color:#C08060}
+.gac{padding:13px 17px 17px;display:none}
+.gac.vis{display:block}
+.gtb{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.gbk{background:none;border:1px solid var(--bd);border-radius:8px;padding:5px 10px;font-size:11px;color:var(--mt);cursor:pointer;font-family:'DM Sans',sans-serif}
+.tq{font-family:'Cormorant Garamond',serif;font-size:19px;font-style:italic;font-weight:300;color:var(--tx);text-align:center;padding:16px 0 18px;line-height:1.4;border-bottom:1px solid var(--bd);margin-bottom:16px}
+.tos{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.to{background:var(--sf);border:1.5px solid var(--bd);border-radius:13px;padding:16px 11px;text-align:center;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.to:hover{border-color:var(--gd);transform:scale(1.02)}
+.to.sel{border-color:var(--gd);background:var(--bg)}
+.te{font-size:28px;display:block;margin-bottom:5px}
+.tl{font-size:12px;font-weight:400;color:var(--tx)}
+.tr{margin-top:13px;padding:11px 13px;background:var(--st);border-radius:11px;text-align:center;display:none}
+[data-theme=dark] .tr{background:var(--bd)}
+.tr.vis{display:block}
+.tp2{font-size:12px;color:var(--mt);font-weight:300}
+.tm{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--tx);margin-top:3px}
+
+/* ── NUDGES ── */
+.rl{padding:4px 0 14px}
+.ri{display:flex;align-items:center;padding:11px 17px;border-top:1px solid var(--bd);gap:11px}
+.rtb{text-align:center;min-width:44px}
+.rt{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;color:var(--tx)}
+.rap{font-size:9px;color:var(--sb);letter-spacing:.05em;text-transform:uppercase}
+.ric{font-size:19px}
+.rlb{font-size:12px;font-weight:400;color:var(--tx)}
+.rds{font-size:10px;color:var(--mt);font-weight:300;margin-top:1px}
+.tog{margin-left:auto;width:36px;height:19px;background:var(--st);border-radius:10px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;border:none}
+.tog::after{content:'';position:absolute;top:2px;left:2px;width:15px;height:15px;background:white;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.tog.on{background:var(--gd)}.tog.on::after{transform:translateX(17px)}
+
+/* ── SETTINGS ── */
+.st-hd{padding:18px 22px 13px;display:flex;align-items:center;gap:13px;border-bottom:1px solid var(--bd);background:var(--sf)}
+.st-bk{background:none;border:1px solid var(--bd);border-radius:8px;padding:5px 11px;font-size:12px;color:var(--mt);cursor:pointer;font-family:'DM Sans',sans-serif}
+.st-tl{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:300;color:var(--tx)}
+.st-bd{padding:10px 0 30px}
+.st-sc{font-size:9px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--sb);padding:14px 19px 5px}
+.sti{display:flex;align-items:center;padding:12px 19px;border-top:1px solid var(--bd);gap:11px;cursor:pointer;transition:background .15s}
+.sti:hover{background:var(--sf)}
+.stic{font-size:19px;width:26px;text-align:center}
+.stlb{font-size:13px;font-weight:400;color:var(--tx);flex:1}
+.stvl{font-size:11px;color:var(--mt);font-weight:300}
+.star{font-size:13px;color:var(--sb)}
+.st-dg{color:var(--er)!important}
+.sp{display:none;padding:14px 19px;animation:fadeUp .25s ease}
+.sp.vis{display:block}
+.pttl{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:300;color:var(--tx);margin-bottom:14px}
+.tho{display:flex;gap:9px}
+.topt{flex:1;border:1.5px solid var(--bd);border-radius:13px;padding:13px 11px;text-align:center;cursor:pointer;transition:all .2s}
+.topt.active{border-color:var(--gd);background:var(--bg)}
+.toi{font-size:22px;display:block;margin-bottom:4px}
+.tol{font-size:11px;font-weight:400;color:var(--tx)}
+.msi{display:flex;align-items:center;padding:11px 0;border-top:1px solid var(--bd);gap:11px}
+.msic{font-size:20px}
+.mst{font-size:12px;font-weight:500;color:var(--tx)}
+.msd{font-size:10px;color:var(--mt);font-weight:300}
+.msd2{margin-left:auto;font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:300;color:var(--gd)}
+.nsi{display:flex;align-items:center;padding:11px 0;border-top:1px solid var(--bd);gap:9px}
+.nsic{font-size:17px}
+.nslb{font-size:12px;font-weight:400;color:var(--tx);flex:1}
+.nssb{font-size:10px;color:var(--mt);font-weight:300}
+.priv{background:var(--sf);border:1px solid var(--bd);border-radius:11px;padding:13px 15px;margin-bottom:13px;font-size:12px;color:var(--mt);font-weight:300;line-height:1.6}
+.dbtn{width:100%;background:none;border:1.5px solid var(--er);border-radius:50px;padding:12px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:400;color:var(--er);cursor:pointer;letter-spacing:.06em;text-transform:uppercase;transition:all .2s;margin-bottom:9px}
+.dbtn:hover{background:rgba(192,87,74,.07)}
+.avr{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:14px;background:var(--sf);border:1px solid var(--bd);border-radius:13px}
+.avc{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--bl),var(--gl));display:flex;align-items:center;justify-content:center;font-size:20px;font-family:'Cormorant Garamond',serif;font-weight:300;color:var(--dp);flex-shrink:0}
+.avn{font-size:14px;font-weight:500;color:var(--tx)}
+.ave{font-size:11px;color:var(--mt);font-weight:300}
+
+/* ── MODAL ── */
+.mov2{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;z-index:200}
+.mov2.vis{opacity:1;pointer-events:all}
+.msh{background:var(--sf);border-radius:20px 20px 0 0;padding:26px 22px 34px;width:100%;max-width:480px;transform:translateY(18px);transition:transform .25s ease}
+.mov2.vis .msh{transform:translateY(0)}
+.mttl{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:300;color:var(--tx);margin-bottom:7px}
+.mdsc{font-size:12px;color:var(--mt);font-weight:300;line-height:1.6;margin-bottom:20px}
+.mrow{display:flex;gap:9px}
+.mcan{flex:1;background:var(--st);border:none;border-radius:50px;padding:12px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--tx);cursor:pointer}
+.mcon{flex:1;background:var(--er);border:none;border-radius:50px;padding:12px;font-family:'DM Sans',sans-serif;font-size:12px;color:white;cursor:pointer;letter-spacing:.06em}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--dp);color:var(--cr);padding:8px 17px;border-radius:50px;font-size:11px;font-weight:300;letter-spacing:.04em;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:300}
+[data-theme=dark] .toast{background:var(--gd);color:#1C1814}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ══ SIGN IN ══ -->
+<div id="scr-si" class="screen active">
+  <div class="si-bg"></div>
+  <div class="si-deco">❧</div>
+  <div class="si-cnt">
+    <div><div class="logo">to<span>gether</span></div><div class="si-tag">stay close, no matter the miles</div></div>
+    <div class="si-form">
+      <div id="siFm">
+        <div class="si-hl">Welcome <em>back</em></div>
+        <div class="si-sub">Sign in to continue with your partner</div>
+        <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="siEm" placeholder="you@example.com"><div class="ferr" id="eErr">Please enter a valid email</div></div>
+        <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="siPw" placeholder="••••••••"><div class="ferr" id="pErr">Password must be at least 6 characters</div></div>
+        <button class="pbtn" onclick="doSI()">Sign In</button>
+        <div class="si-sw">No account? <a onclick="showSU()">Create one</a></div>
+      </div>
+      <div id="suFm" style="display:none">
+        <div class="si-hl">Join <em>together</em></div>
+        <div class="si-sub">Create your account to get started</div>
+        <div class="fg"><label class="fl">Your Name</label><input class="fi" id="suNm" placeholder="Your first name"></div>
+        <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="suEm" placeholder="you@example.com"></div>
+        <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="suPw" placeholder="••••••••"></div>
+        <button class="pbtn" onclick="doSU()">Create Account</button>
+        <div class="si-sw">Already have an account? <a onclick="showSI()">Sign in</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ONBOARDING ══ -->
+<div id="scr-ob" class="screen">
+  <div class="ob-prog"><div class="pd done" id="d0"></div><div class="pd" id="d1"></div><div class="pd" id="d2"></div><div class="pd" id="d3"></div></div>
+  <div class="ob-step active" id="s0"><div class="step-ic">💛</div><div class="step-ttl">Let's set up your <em>connection</em></div><div class="step-ds">Just a few things to personalize your experience — takes about 2 minutes.</div><div class="fg"><label class="fl">Your name</label><input class="fi" id="o0a" placeholder="Your first name"></div><div class="fg"><label class="fl">Your partner's name</label><input class="fi" id="o0b" placeholder="Their first name"></div></div>
+  <div class="ob-step" id="s1"><div class="step-ic">🌍</div><div class="step-ttl">Where is <em id="s1p">your partner</em>?</div><div class="step-ds">This helps us calculate the distance and sync reminder timezones.</div><div class="fg"><label class="fl">Their city</label><input class="fi" id="o1a" placeholder="e.g. New York, London, Tokyo"></div><div class="fg"><label class="fl">Your city</label><input class="fi" id="o1b" placeholder="Your city"></div></div>
+  <div class="ob-step" id="s2"><div class="step-ic">📅</div><div class="step-ttl">When did your <em>story</em> begin?</div><div class="step-ds">Your anniversary — we'll celebrate every milestone along the way.</div><div class="fg"><label class="fl">Relationship start date</label><input class="fi" type="date" id="o2"></div></div>
+  <div class="ob-step" id="s3"><div class="step-ic">✈️</div><div class="step-ttl">When's your next <em>visit</em>?</div><div class="step-ds">Set a countdown for your home screen — that little number keeps you going.</div><div class="fg"><label class="fl">Next visit date</label><input class="fi" type="date" id="o3a"></div><div class="fg"><label class="fl">Visit label (optional)</label><input class="fi" id="o3b" placeholder="e.g. Summer trip, Coming home..."></div></div>
+  <div class="ob-ft"><button class="bk-sm" id="obBk" onclick="obPv()" style="display:none">← Back</button><button class="nx-btn" id="obNx" onclick="obNx()">Continue →</button></div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="scr-main" class="screen" style="flex-direction:column;min-height:100vh">
+  <header class="app-hdr">
+    <div><div class="app-ttl">to<span>gether</span></div></div>
+    <div class="hdr-r"><div class="pt-lb">your person</div><span class="pt-nm" id="hPt">Alex ♡</span><div class="dist-b"><span class="pls"></span><span id="hDs">connecting...</span></div></div>
+  </header>
+  <nav class="tab-nav">
+    <button class="tb active" onclick="swTab('home',this)"><span class="ti">🏡</span>Home</button>
+    <button class="tb" onclick="swTab('msgs',this)"><span class="ti">💌</span>Messages</button>
+    <button class="tb" onclick="swTab('mom',this)"><span class="ti">📸</span>Moments</button>
+    <button class="tb" onclick="swTab('jnl',this)"><span class="ti">📓</span>Journal</button>
+    <button class="tb" onclick="swTab('gms',this)"><span class="ti">🎲</span>Games</button>
+    <button class="tb" onclick="swTab('ndg',this)"><span class="ti">🔔</span>Nudges</button>
+    <button class="tb" onclick="goSt()"><span class="ti">⚙️</span>Settings</button>
+  </nav>
+  <main class="tab-con">
+
+    <!-- HOME -->
+    <div id="tab-home" class="tp active">
+      <div class="gh"><div class="gt" id="gTm">Good morning</div><div class="gx">Hey, <em id="gNm">you.</em><br><span id="gPt">Alex</span> is thinking of you.</div><div class="gs" id="gDs">It's been 47 days of love across the miles.</div></div>
+      <div class="cd"><div class="cdl"><span class="cdi">✈️</span><div><div class="cdlb"><strong id="vLbl">Next visit</strong>coming up soon</div></div></div><div><div class="cdn" id="cdN">—</div><div class="cdu">days</div></div></div>
+      <div class="qa">
+        <button class="qab" onclick="swTab('msgs',document.querySelectorAll('.tb')[1])"><span class="qi">☀️</span><span class="ql">Good Morning</span><span class="qd">Send your first hello</span></button>
+        <button class="qab" onclick="swTab('mom',document.querySelectorAll('.tb')[2])"><span class="qi">📸</span><span class="ql">Share a Moment</span><span class="qd">Show them your day</span></button>
+        <button class="qab" onclick="swTab('jnl',document.querySelectorAll('.tb')[3])"><span class="qi">✍️</span><span class="ql">Daily Update</span><span class="qd">Tell them everything</span></button>
+        <button class="qab" onclick="swTab('gms',document.querySelectorAll('.tb')[4])"><span class="qi">🎯</span><span class="ql">Play Together</span><span class="qd">It's your turn!</span></button>
+      </div>
+      <div class="ns" onclick="swTab('msgs',document.querySelectorAll('.tb')[1])"><span class="ni">💌</span><div><div class="nt" id="nPt">Alex sent you a message</div><div class="nd">"Good morning love, I was thinking about you..."</div></div><span class="na">›</span></div>
+      <div class="card"><div class="ci"><div class="clb">Today's connection</div><div style="font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;font-weight:300;color:var(--tx);line-height:1.5;margin-top:3px">"Distance means so little when someone means so much."</div><div style="font-size:10px;color:var(--sb);margin-top:7px">You've exchanged 12 messages today ✓</div></div></div>
+      <div class="bsp"></div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div id="tab-msgs" class="tp">
+      <div class="sh"><div class="sttl">Send some <em>love</em></div><div class="ssub">Choose the kind of message</div></div>
+      <div class="mtr">
+        <div class="mc active" onclick="selM(this,'☀️ Good Morning')"><span class="mci">☀️</span><span class="mcl">Morning</span></div>
+        <div class="mc" onclick="selM(this,'🌙 Good Night')"><span class="mci">🌙</span><span class="mcl">Night</span></div>
+        <div class="mc" onclick="selM(this,'💭 Thinking of You')"><span class="mci">💭</span><span class="mcl">Thinking</span></div>
+        <div class="mc" onclick="selM(this,'❤️ Love Note')"><span class="mci">❤️</span><span class="mcl">Love Note</span></div>
+        <div class="mc" onclick="selM(this,'😄 Day Update')"><span class="mci">😄</span><span class="mcl">Update</span></div>
+      </div>
+      <div class="ca"><div class="clb" style="padding:6px 2px 5px" id="mLbl">☀️ Good Morning</div><textarea class="cb" id="cBox" placeholder="Write something sweet..." oninput="updC(this)"></textarea><div class="cf"><span class="ccnt" id="ccnt">0 / 500</span><div style="display:flex;gap:6px"><button class="sugb" onclick="doSug()">✨ Suggest</button><button class="sbtn" onclick="sndMsg()">Send</button></div></div></div>
+      <div class="pm">
+        <div class="clb" style="padding:9px 17px 0">Recent</div>
+        <div class="mi"><div class="mav">🌙</div><div class="mb"><div class="mm"><span class="msn" id="mp1">Alex</span><span class="mtm">Last night, 10:42 PM</span></div><div class="mtag">Good Night</div><div class="mtxt">Sweet dreams my love. I keep replaying our last video call and smiling 🥰</div></div></div>
+        <div class="mi"><div class="mav">☀️</div><div class="mb"><div class="mm"><span class="msn">You</span><span class="mtm">Yesterday, 7:05 AM</span></div><div class="mtag">Good Morning</div><div class="mtxt">Woke up wishing you were here to share coffee with. Miss you!</div></div></div>
+        <div class="mi"><div class="mav">💭</div><div class="mb"><div class="mm"><span class="msn" id="mp2">Alex</span><span class="mtm">Yesterday, 2:18 PM</span></div><div class="mtag">Thinking of You</div><div class="mtxt">Just heard that song in a coffee shop. You know which one. ♡</div></div></div>
+      </div>
+      <div class="bsp"></div>
+    </div>
+
+    <!-- MOMENTS -->
+    <div id="tab-mom" class="tp">
+      <div class="sh"><div class="sttl">Your <em>moments</em></div><div class="ssub">Share glimpses of your day</div></div>
+      <div class="mup" onclick="toast('📸 Photo upload coming soon!')"><span class="upi">🌅</span><div class="upt">Share a moment</div><div class="ups">Let them see what you're up to</div></div>
+      <div class="mg">
+        <div class="moc"><div class="mep">☕</div><div class="mov"><div class="mcp">Morning coffee ritual</div><div class="msr" id="mc1">Alex · 8am</div></div><button class="rab" onclick="toast('❤️ Loved!')">❤️</button></div>
+        <div class="moc"><div class="mep">🌳</div><div class="mov"><div class="mcp">Walk in the park</div><div class="msr">You · 12pm</div></div><button class="rab" onclick="toast('😍 Aww!')">😍</button></div>
+        <div class="moc"><div class="mep">🍜</div><div class="mov"><div class="mcp">Made your fave!</div><div class="msr" id="mc2">Alex · 7pm</div></div><button class="rab" onclick="toast('🥹 So sweet!')">🥹</button></div>
+        <div class="moc"><div class="mep">🌃</div><div class="mov"><div class="mcp">City lights for you</div><div class="msr" id="mc3">Alex · 9pm</div></div><button class="rab" onclick="toast('💛 Beautiful!')">💛</button></div>
+      </div>
+      <div class="bsp"></div>
+    </div>
+
+    <!-- JOURNAL -->
+    <div id="tab-jnl" class="tp">
+      <div class="sh"><div class="sttl">Daily <em>updates</em></div><div class="ssub">Tell them about your day</div></div>
+      <div class="jst"><div><div class="stl">Day streak</div><div class="stn">23</div><div class="sts">days in a row</div></div><div class="stf">🔥🔥🔥</div></div>
+      <div class="jp"><div class="plb">Today's prompts</div><div class="pcs">
+        <div class="pc" onclick="usePr('What was the best part of your day?')"><span class="pt">What was the best part of your day?</span><span class="par">→</span></div>
+        <div class="pc" onclick="usePr('Something that made you think of me...')"><span class="pt">Something that made you think of me...</span><span class="par">→</span></div>
+        <div class="pc" onclick="usePr('What are you looking forward to tomorrow?')"><span class="pt">What are you looking forward to tomorrow?</span><span class="par">→</span></div>
+      </div></div>
+      <div class="je"><textarea class="eb" id="jBox" placeholder="Write your daily update..."></textarea><div class="cf" style="margin-top:6px"><div class="mdr"><button class="mdb" onclick="addM('😊')">😊</button><button class="mdb" onclick="addM('😴')">😴</button><button class="mdb" onclick="addM('😔')">😔</button><button class="mdb" onclick="addM('🥰')">🥰</button></div><button class="sbtn" onclick="svEnt()">Save Entry</button></div></div>
+      <div class="pe"><div class="clb" style="padding:9px 17px 0" id="jPtL">Alex's recent entries</div>
+        <div class="ei"><div class="ed">Yesterday · wrote</div><div class="ep">"Had the most exhausting meeting but then I got your message and everything felt okay again."</div><div class="er2">🥰 😊 ❤️</div></div>
+        <div class="ei"><div class="ed">2 days ago · wrote</div><div class="ep">"Saw a dog that looked exactly like our future dog and I nearly cried on the street lol..."</div><div class="er2">😂 🐶 ❤️</div></div>
+      </div>
+      <div class="bsp"></div>
+    </div>
+
+    <!-- GAMES -->
+    <div id="tab-gms" class="tp">
+      <div class="sh"><div class="sttl">Play <em>together</em></div><div class="ssub">Little games across the miles</div></div>
+      <div id="gLst" class="gg">
+        <div class="gc" onclick="opGm()"><div class="gci"><div class="gic">🤔</div><div class="gin"><div class="gnm">This or That</div><div class="gds">Answer either/or questions and see if you think alike</div></div><div class="gbg turn">Your turn</div></div></div>
+        <div class="gc" onclick="toast('🚀 Coming soon!')"><div class="gci"><div class="gic">💭</div><div class="gin"><div class="gnm">Finish My Sentence</div><div class="gds">Complete each other's thoughts in surprising ways</div></div><div class="gbg new">New</div></div></div>
+        <div class="gc" onclick="toast('🚀 Coming soon!')"><div class="gci"><div class="gic">🎵</div><div class="gin"><div class="gnm">Song Share</div><div class="gds">Send a song that describes how you feel right now</div></div><div class="gbg new">New</div></div></div>
+        <div class="gc" onclick="toast('🚀 Coming soon!')"><div class="gci"><div class="gic">🗺️</div><div class="gin"><div class="gnm">Dream Trip Planner</div><div class="gds">Build your perfect future trip together</div></div><div class="gbg">2 saved</div></div></div>
+      </div>
+      <div id="gAct" class="gac">
+        <div class="gtb"><button class="gbk" onclick="clGm()">← Back</button><div style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300">This or That</div><div style="font-size:10px;color:var(--mt)">Q <span id="qN">1</span>/5</div></div>
+        <div class="tq" id="tQ">Would you rather live in the mountains 🏔️ or by the ocean 🌊?</div>
+        <div class="tos"><div class="to" id="tO1" onclick="pkT(this,1)"><span class="te">🏔️</span><span class="tl">Mountains</span></div><div class="to" id="tO2" onclick="pkT(this,2)"><span class="te">🌊</span><span class="tl">Ocean</span></div></div>
+        <div class="tr" id="tRv"><div class="tp2" id="tPt">Alex chose...</div><div class="tm" id="tMt"></div></div>
+        <div style="text-align:center;margin-top:13px;display:none" id="tNx"><button class="sbtn" onclick="nxQ()">Next →</button></div>
+      </div>
+      <div class="bsp"></div>
+    </div>
+
+    <!-- NUDGES -->
+    <div id="tab-ndg" class="tp">
+      <div class="sh"><div class="sttl">Love <em>nudges</em></div><div class="ssub">Reminders to stay connected all day</div></div>
+      <div class="rl">
+        <div class="ri"><div class="rtb"><div class="rt">8:00</div><div class="rap">AM</div></div><span class="ric">☀️</span><div><div class="rlb">Good Morning</div><div class="rds">Start the day with a hello</div></div><button class="tog on" onclick="togR(this)"></button></div>
+        <div class="ri"><div class="rtb"><div class="rt">12:30</div><div class="rap">PM</div></div><span class="ric">🥗</span><div><div class="rlb">Lunch Check-in</div><div class="rds">Share what you're having</div></div><button class="tog on" onclick="togR(this)"></button></div>
+        <div class="ri"><div class="rtb"><div class="rt">3:00</div><div class="rap">PM</div></div><span class="ric">💭</span><div><div class="rlb">Afternoon Thought</div><div class="rds">Send a thinking of you</div></div><button class="tog" onclick="togR(this)"></button></div>
+        <div class="ri"><div class="rtb"><div class="rt">6:00</div><div class="rap">PM</div></div><span class="ric">📸</span><div><div class="rlb">Evening Moment</div><div class="rds">Share a photo of your evening</div></div><button class="tog on" onclick="togR(this)"></button></div>
+        <div class="ri"><div class="rtb"><div class="rt">8:30</div><div class="rap">PM</div></div><span class="ric">📓</span><div><div class="rlb">Day Wrap-up</div><div class="rds">Write your journal entry</div></div><button class="tog on" onclick="togR(this)"></button></div>
+        <div class="ri"><div class="rtb"><div class="rt">10:30</div><div class="rap">PM</div></div><span class="ric">🌙</span><div><div class="rlb">Good Night</div><div class="rds">Say goodnight before bed</div></div><button class="tog on" onclick="togR(this)"></button></div>
+      </div>
+      <div class="card"><div class="ci"><div class="clb">Love language stats</div><div style="margin-top:9px;display:flex;flex-direction:column;gap:8px">
+        <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>Messages sent</span><span style="color:var(--gd);font-weight:500">24 this week</span></div><div style="background:var(--st);border-radius:4px;height:4px"><div style="background:var(--gd);height:4px;border-radius:4px;width:80%"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>Moments shared</span><span style="color:var(--gd);font-weight:500">8 this week</span></div><div style="background:var(--st);border-radius:4px;height:4px"><div style="background:var(--sg);height:4px;border-radius:4px;width:55%"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>Journal streak</span><span style="color:var(--gd);font-weight:500">23 days 🔥</span></div><div style="background:var(--st);border-radius:4px;height:4px"><div style="background:var(--bl);height:4px;border-radius:4px;width:90%"></div></div></div>
+      </div></div></div>
+      <div class="bsp"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══ SETTINGS ══ -->
+<div id="scr-st" class="screen">
+  <div class="st-hd"><button class="st-bk" onclick="goBack()">← Back</button><div class="st-tl">Settings</div></div>
+  <div id="stMn" class="st-bd">
+    <div class="st-sc">Profile</div>
+    <div class="sti" onclick="shPn('prf')"><span class="stic">👤</span><span class="stlb">Edit profile &amp; partner info</span><span class="star">›</span></div>
+    <div class="st-sc">Appearance</div>
+    <div class="sti" onclick="shPn('thm')"><span class="stic">🎨</span><span class="stlb">App theme</span><span class="stvl" id="thV">Light</span><span class="star">›</span></div>
+    <div class="st-sc">Notifications</div>
+    <div class="sti" onclick="shPn('ntf')"><span class="stic">🔔</span><span class="stlb">Notification preferences</span><span class="star">›</span></div>
+    <div class="st-sc">Relationship</div>
+    <div class="sti" onclick="shPn('mls')"><span class="stic">🎉</span><span class="stlb">Relationship milestones</span><span class="star">›</span></div>
+    <div class="st-sc">Account</div>
+    <div class="sti" onclick="shPn('prv')"><span class="stic">🔒</span><span class="stlb">Privacy &amp; security</span><span class="star">›</span></div>
+    <div class="sti" onclick="doLo()"><span class="stic">🚪</span><span class="stlb st-dg">Sign out</span></div>
+    <div class="bsp"></div>
+  </div>
+
+  <!-- Profile -->
+  <div id="p-prf" class="sp">
+    <button class="bk-sm" onclick="hdPn()" style="margin-bottom:14px">← Back</button>
+    <div class="pttl">Edit Profile</div>
+    <div class="avr"><div class="avc" id="avC">Y</div><div><div class="avn" id="avN">Your Name</div><div class="ave" id="avE">your@email.com</div></div></div>
+    <div class="fg"><label class="fl">Your name</label><input class="fi" id="eYN"></div>
+    <div class="fg"><label class="fl">Partner's name</label><input class="fi" id="ePN"></div>
+    <div class="fg"><label class="fl">Your city</label><input class="fi" id="eYC"></div>
+    <div class="fg"><label class="fl">Partner's city</label><input class="fi" id="ePC"></div>
+    <div class="fg"><label class="fl">Next visit date</label><input class="fi" type="date" id="eVD"></div>
+    <div class="fg"><label class="fl">Visit label</label><input class="fi" id="eVL" placeholder="e.g. Coming home!"></div>
+    <button class="pbtn" onclick="svPrf()">Save Changes</button>
+    <div class="bsp"></div>
+  </div>
+
+  <!-- Theme -->
+  <div id="p-thm" class="sp">
+    <button class="bk-sm" onclick="hdPn()" style="margin-bottom:14px">← Back</button>
+    <div class="pttl">App Theme</div>
+    <div class="tho"><div class="topt active" id="thL" onclick="setTh('light')"><span class="toi">☀️</span><span class="tol">Light</span></div><div class="topt" id="thD" onclick="setTh('dark')"><span class="toi">🌙</span><span class="tol">Dark</span></div></div>
+    <div style="margin-top:16px;font-size:12px;color:var(--mt);font-weight:300;line-height:1.6">Soft light mode uses warm creams. Dark mode uses deep charcoals — easy on the eyes at night.</div>
+  </div>
+
+  <!-- Notifications -->
+  <div id="p-ntf" class="sp">
+    <button class="bk-sm" onclick="hdPn()" style="margin-bottom:14px">← Back</button>
+    <div class="pttl">Notifications</div>
+    <div class="nsi"><span class="nsic">☀️</span><div><div class="nslb">Good morning reminder</div><div class="nssb">Daily at 8:00 AM</div></div><button class="tog on" onclick="togR(this)"></button></div>
+    <div class="nsi"><span class="nsic">💌</span><div><div class="nslb">New message from partner</div><div class="nssb">Instant notification</div></div><button class="tog on" onclick="togR(this)"></button></div>
+    <div class="nsi"><span class="nsic">📸</span><div><div class="nslb">New moment shared</div><div class="nssb">When your partner posts a photo</div></div><button class="tog on" onclick="togR(this)"></button></div>
+    <div class="nsi"><span class="nsic">📓</span><div><div class="nslb">Partner's journal entry</div><div class="nssb">When they write their daily update</div></div><button class="tog" onclick="togR(this)"></button></div>
+    <div class="nsi"><span class="nsic">🎉</span><div><div class="nslb">Milestone reminders</div><div class="nssb">Anniversaries and special dates</div></div><button class="tog on" onclick="togR(this)"></button></div>
+    <div class="nsi"><span class="nsic">🌙</span><div><div class="nslb">Good night reminder</div><div class="nssb">Daily at 10:30 PM</div></div><button class="tog on" onclick="togR(this)"></button></div>
+  </div>
+
+  <!-- Milestones -->
+  <div id="p-mls" class="sp">
+    <button class="bk-sm" onclick="hdPn()" style="margin-bottom:14px">← Back</button>
+    <div class="pttl">Milestones</div>
+    <div id="mlLst"></div>
+    <div style="margin-top:13px">
+      <div class="fg"><label class="fl">Add a milestone</label><input class="fi" id="nmT" placeholder="e.g. First I love you, Met in person..."></div>
+      <div class="fg"><input class="fi" type="date" id="nmD"></div>
+      <button class="sbtn" style="width:100%;border-radius:50px;padding:12px" onclick="addMl()">Add Milestone</button>
+    </div>
+    <div class="bsp"></div>
+  </div>
+
+  <!-- Privacy -->
+  <div id="p-prv" class="sp">
+    <button class="bk-sm" onclick="hdPn()" style="margin-bottom:14px">← Back</button>
+    <div class="pttl">Privacy &amp; Account</div>
+    <div class="priv">Your messages, moments, and journal entries are only visible to you and your partner. We never share your data with third parties.</div>
+    <div class="fg"><label class="fl">New password</label><input class="fi" type="password" placeholder="New password"></div>
+    <div class="fg"><input class="fi" type="password" placeholder="Confirm new password"></div>
+    <button class="sbtn" style="width:100%;border-radius:50px;padding:12px;margin-bottom:14px" onclick="toast('🔒 Password updated!')">Update Password</button>
+    <button class="dbtn" onclick="doDl()">Delete My Account</button>
+    <div style="font-size:11px;color:var(--sb);font-weight:300;text-align:center;margin-top:5px">This will permanently delete all your data.</div>
+    <div class="bsp"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="mov2" id="modal"><div class="msh"><div class="mttl" id="mTl">Are you sure?</div><div class="mdsc" id="mDs">This action cannot be undone.</div><div class="mrow"><button class="mcan" onclick="clMd()">Cancel</button><button class="mcon" id="mCn">Confirm</button></div></div></div>
+
+<div class="toast" id="toastEl"></div>
+</div>
+
+<script>
+const S={nm:'',em:'',pnm:'Alex',yc:'',pc:'',sd:'',vd:'',vl:'Next visit',th:'light',
+ms:[{i:'💑',t:'First date',d:'2024-04-14'},{i:'✈️',t:'Started long distance',d:'2024-09-01'},{i:'🎂',t:'One year together',d:'2025-04-14'}]};
+
+function scr(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('scr-'+id).classList.add('active')}
+
+// AUTH
+function showSU(){document.getElementById('siFm').style.display='none';document.getElementById('suFm').style.display='block'}
+function showSI(){document.getElementById('suFm').style.display='none';document.getElementById('siFm').style.display='block'}
+function doSI(){
+  const e=document.getElementById('siEm').value.trim(),p=document.getElementById('siPw').value;
+  let ok=true;
+  if(!e.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)){document.getElementById('eErr').style.display='block';ok=false}else document.getElementById('eErr').style.display='none';
+  if(p.length<6){document.getElementById('pErr').style.display='block';ok=false}else document.getElementById('pErr').style.display='none';
+  if(!ok)return;
+  S.em=e;toast('👋 Welcome back!');setTimeout(()=>{updUI();scr('main')},500);
+}
+function doSU(){
+  const n=document.getElementById('suNm').value.trim(),e=document.getElementById('suEm').value.trim(),p=document.getElementById('suPw').value;
+  if(!n||!e.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)||p.length<6){toast('Please fill in all fields correctly');return}
+  S.nm=n;S.em=e;scr('ob');
+}
+
+// ONBOARDING
+let ob=0;
+function obNx(){
+  if(ob===0){const a=document.getElementById('o0a').value.trim(),b=document.getElementById('o0b').value.trim();if(!a||!b){toast('Please enter both names');return}S.nm=a;S.pnm=b;document.getElementById('s1p').textContent=b}
+  if(ob===1){S.pc=document.getElementById('o1a').value.trim();S.yc=document.getElementById('o1b').value.trim()}
+  if(ob===2){S.sd=document.getElementById('o2').value}
+  if(ob===3){S.vd=document.getElementById('o3a').value;S.vl=document.getElementById('o3b').value||'Next visit';updUI();scr('main');toast('💛 All set! Welcome, '+S.nm+'!');return}
+  document.getElementById('s'+ob).classList.remove('active');document.getElementById('d'+ob).classList.add('done');
+  ob++;document.getElementById('s'+ob).classList.add('active');document.getElementById('d'+ob).classList.add('done');
+  document.getElementById('obBk').style.display=ob>0?'block':'none';
+  if(ob===3)document.getElementById('obNx').textContent="Let's go! 💛";
+}
+function obPv(){
+  if(ob===0)return;
+  document.getElementById('s'+ob).classList.remove('active');document.getElementById('d'+ob).classList.remove('done');
+  ob--;document.getElementById('s'+ob).classList.add('active');
+  document.getElementById('obBk').style.display=ob>0?'block':'none';
+  document.getElementById('obNx').textContent='Continue →';
+}
+
+function updUI(){
+  const pn=S.pnm||'Alex';
+  document.getElementById('hPt').textContent=pn+' ♡';
+  document.getElementById('gPt').textContent=pn;
+  document.getElementById('nPt').textContent=pn+' sent you a message';
+  document.getElementById('jPtL').textContent=pn+"'s recent entries";
+  document.getElementById('tPt').textContent=pn+' chose...';
+  ['mp1','mp2','mc1','mc2','mc3'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=el.textContent.replace(/Alex/g,pn)});
+  if(S.nm)document.getElementById('gNm').textContent=S.nm+'.';
+  if(S.yc&&S.pc)document.getElementById('hDs').textContent=S.yc+' ↔ '+S.pc;
+  else if(S.pc)document.getElementById('hDs').textContent='Partner in '+S.pc;
+  if(S.vd){const d=Math.ceil((new Date(S.vd)-new Date())/86400000);document.getElementById('cdN').textContent=d>0?d:'🎉';document.getElementById('vLbl').textContent=S.vl||'Next visit'}
+  if(S.sd){const d=Math.floor((new Date()-new Date(S.sd))/86400000);document.getElementById('gDs').textContent="It's been "+d+" days of love across the miles."}
+  const h=new Date().getHours();document.getElementById('gTm').textContent=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  rnMls();
+  document.getElementById('eYN').value=S.nm||'';document.getElementById('ePN').value=S.pnm||'';
+  document.getElementById('eYC').value=S.yc||'';document.getElementById('ePC').value=S.pc||'';
+  document.getElementById('eVD').value=S.vd||'';document.getElementById('eVL').value=S.vl||'';
+  document.getElementById('avN').textContent=S.nm||'Your Name';document.getElementById('avE').textContent=S.em||'';
+  document.getElementById('avC').textContent=S.nm?S.nm[0].toUpperCase():'Y';
+}
+
+// SETTINGS NAV
+function goSt(){hdPn();document.getElementById('stMn').style.display='block';scr('st')}
+function goBack(){scr('main')}
+function shPn(id){document.getElementById('stMn').style.display='none';document.querySelectorAll('.sp').forEach(p=>p.classList.remove('vis'));document.getElementById('p-'+id).classList.add('vis')}
+function hdPn(){document.getElementById('stMn').style.display='block';document.querySelectorAll('.sp').forEach(p=>p.classList.remove('vis'))}
+
+function svPrf(){
+  S.nm=document.getElementById('eYN').value.trim()||S.nm;
+  S.pnm=document.getElementById('ePN').value.trim()||S.pnm;
+  S.yc=document.getElementById('eYC').value.trim()||S.yc;
+  S.pc=document.getElementById('ePC').value.trim()||S.pc;
+  S.vd=document.getElementById('eVD').value||S.vd;
+  S.vl=document.getElementById('eVL').value||S.vl;
+  updUI();toast('✅ Profile saved!');hdPn();
+}
+
+function setTh(t){
+  S.th=t;document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'');
+  document.getElementById('thL').classList.toggle('active',t==='light');
+  document.getElementById('thD').classList.toggle('active',t==='dark');
+  document.getElementById('thV').textContent=t==='dark'?'Dark':'Light';
+  toast(t==='dark'?'🌙 Dark mode on':'☀️ Light mode on');
+}
+
+function rnMls(){
+  const c=document.getElementById('mlLst');if(!c)return;c.innerHTML='';
+  S.ms.forEach(m=>{
+    const d=Math.floor((new Date()-new Date(m.d))/86400000);
+    const f=new Date(m.d).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    c.innerHTML+=`<div class="msi"><span class="msic">${m.i}</span><div><div class="mst">${m.t}</div><div class="msd">${f}</div></div><div class="msd2">${d}d</div></div>`;
+  });
+}
+function addMl(){
+  const t=document.getElementById('nmT').value.trim(),d=document.getElementById('nmD').value;
+  if(!t||!d){toast('Please fill in both fields');return}
+  S.ms.push({i:'🎯',t,d});document.getElementById('nmT').value='';document.getElementById('nmD').value='';
+  rnMls();toast('🎉 Milestone added!');
+}
+
+function doLo(){
+  document.getElementById('mTl').textContent='Sign out?';
+  document.getElementById('mDs').textContent="You'll need to sign back in to access your account.";
+  document.getElementById('mCn').textContent='Sign out';
+  document.getElementById('mCn').onclick=()=>{clMd();setTimeout(()=>{scr('si');toast('👋 Signed out')},200)};
+  document.getElementById('modal').classList.add('vis');
+}
+function doDl(){
+  document.getElementById('mTl').textContent='Delete account?';
+  document.getElementById('mDs').textContent='This will permanently delete all your data. This cannot be undone.';
+  document.getElementById('mCn').textContent='Delete forever';
+  document.getElementById('mCn').onclick=()=>{clMd();setTimeout(()=>{scr('si');toast('Account deleted')},200)};
+  document.getElementById('modal').classList.add('vis');
+}
+function clMd(){document.getElementById('modal').classList.remove('vis')}
+
+// TABS
+function swTab(id,btn){
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');btn.classList.add('active');
+}
+
+// MESSAGES
+let cMt='☀️ Good Morning';
+function selM(c,t){document.querySelectorAll('.mc').forEach(x=>x.classList.remove('active'));c.classList.add('active');cMt=t;document.getElementById('mLbl').textContent=t;const ph={'☀️ Good Morning':'Wish them a beautiful morning...','🌙 Good Night':'Say good night...','💭 Thinking of You':'Share what made you think of them...','❤️ Love Note':'Pour your heart out...','😄 Day Update':'Tell them about your day...'};document.getElementById('cBox').placeholder=ph[t]||'Write something sweet...'}
+function updC(el){document.getElementById('ccnt').textContent=el.value.length+' / 500'}
+const sug={'☀️ Good Morning':['Good morning, love! Woke up thinking about your laugh ☀️','Morning! Had a dream you were here making breakfast. Miss you 💛'],'🌙 Good Night':["Good night, love. Sleep well wherever you are 🌙","Night night. Another day closer to being together ❤️"],'💭 Thinking of You':["Just heard our song and couldn't stop smiling 💭","Randomly thought about you and had to reach out ✨"],'❤️ Love Note':["I'm so grateful you're mine. You make the distance worth it ❤️","Just a reminder that you're loved today, tomorrow, and always 💛"],'😄 Day Update':["Today was a lot — but the best part was thinking of you 😊","Day update: had great coffee, thought about you constantly. Miss you! 🥰"]};
+function doSug(){const l=sug[cMt]||sug['💭 Thinking of You'];document.getElementById('cBox').value=l[Math.floor(Math.random()*l.length)];updC(document.getElementById('cBox'));toast('✨ Suggestion added!')}
+function sndMsg(){const b=document.getElementById('cBox');if(!b.value.trim()){toast('Write something first 💌');return}toast('💌 Sent to '+(S.pnm||'your partner')+'!');b.value='';document.getElementById('ccnt').textContent='0 / 500'}
+
+// JOURNAL
+function usePr(t){const b=document.getElementById('jBox');b.value=t+'\n\n';b.focus();b.selectionStart=b.selectionEnd=b.value.length}
+function addM(e){document.getElementById('jBox').value+=e+' ';document.getElementById('jBox').focus()}
+function svEnt(){const b=document.getElementById('jBox');if(!b.value.trim()){toast('Write something first ✍️');return}toast('📓 Saved! '+(S.pnm||'Your partner')+' will see it ❤️');b.value=''}
+
+// GAMES
+const qs=[{q:'Mountains 🏔️ or ocean 🌊?',e1:'🏔️',l1:'Mountains',e2:'🌊',l2:'Ocean',a:2,m:true},{q:'Coffee ☕ or Tea 🍵?',e1:'☕',l1:'Coffee',e2:'🍵',l2:'Tea',a:1,m:false},{q:'Movie night 🎬 or fancy dinner 🍽️?',e1:'🎬',l1:'Movie Night',e2:'🍽️',l2:'Dinner Out',a:1,m:true},{q:'Early bird 🌅 or night owl 🦉?',e1:'🌅',l1:'Early Bird',e2:'🦉',l2:'Night Owl',a:2,m:false},{q:'City life 🏙️ or countryside 🌿?',e1:'🏙️',l1:'City',e2:'🌿',l2:'Countryside',a:2,m:true}];
+let qi=0;
+function opGm(){document.getElementById('gLst').style.display='none';document.getElementById('gAct').classList.add('vis')}
+function clGm(){document.getElementById('gLst').style.display='flex';document.getElementById('gAct').classList.remove('vis');rsQ()}
+function rsQ(){document.querySelectorAll('.to').forEach(o=>o.classList.remove('sel'));document.getElementById('tRv').classList.remove('vis');document.getElementById('tNx').style.display='none'}
+function pkT(el,c){if(el.classList.contains('sel'))return;document.querySelectorAll('.to').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');setTimeout(()=>{const q=qs[qi],pn=S.pnm||'Alex',al=q.a===1?q.e1+' '+q.l1:q.e2+' '+q.l2;document.getElementById('tPt').textContent=pn+' chose...';document.getElementById('tMt').textContent=q.m?al+' — you both agree! ❤️':al+' — opposites attract! 😄';document.getElementById('tRv').classList.add('vis');document.getElementById('tNx').style.display='block'},400)}
+function nxQ(){qi=(qi+1)%qs.length;const q=qs[qi];document.getElementById('qN').textContent=qi+1;document.getElementById('tQ').textContent=q.q;document.getElementById('tO1').innerHTML=`<span class="te">${q.e1}</span><span class="tl">${q.l1}</span>`;document.getElementById('tO2').innerHTML=`<span class="te">${q.e2}</span><span class="tl">${q.l2}</span>`;rsQ()}
+
+// TOGGLES
+function togR(b){b.classList.toggle('on');toast(b.classList.contains('on')?'🔔 On':'🔕 Off')}
+
+// TOAST
+let tt;
+function toast(msg){const el=document.getElementById('toastEl');el.textContent=msg;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2200)}
+
+// DEMO shortcut — double-tap the logo
+document.querySelector('.logo').addEventListener('dblclick',()=>{
+  S.nm='Jordan';S.pnm='Alex';S.em='jordan@example.com';S.yc='London';S.pc='New York';
+  S.sd='2024-04-14';S.vd=new Date(Date.now()+28*86400000).toISOString().split('T')[0];S.vl='Summer visit 🌞';
+  updUI();scr('main');toast('💛 Demo loaded — double-tap logo to skip sign in!');
+});
+</script>
+</body>
+</html>
